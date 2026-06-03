@@ -1,7 +1,6 @@
 package com.app.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,12 +13,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.ArrayList;
@@ -31,7 +28,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-/*
+
     //HTTPSecurity pasa por todos los filtros
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -48,11 +45,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(http -> {
                     //Si se hace un http request aese endpoint se le permitetodo
                     //Configura los endpoinst publicos primeramente
-                    http.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
+                    http.requestMatchers(HttpMethod.GET, "/auth/get").permitAll();
 
                     //solo a ese endpoint va a acceder el que tenga la autorizacion READ LECTURAO
                     //Despues los endpoints privadors
-                    http.requestMatchers(HttpMethod.GET, "/auth/hello-secured").hasAuthority("CREATE");
+                    http.requestMatchers(HttpMethod.POST, "/auth/post").hasAnyRole("ADMIN", "DEVELOPER");
+                    http.requestMatchers(HttpMethod.PATCH, "/auth/patch").hasAnyAuthority("REFACTOR");
 
                     //Despue se configuran los endpoints NO ESPECIFICADOS
                     //Cualquier otra solicitud que yo no haya especificado arriba, va a hacer lo siguiente (en este caso denegar el acceso)
@@ -64,8 +62,7 @@ public class SecurityConfig {
                 })
                 .build();
     }
-*/
-
+/*
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -76,7 +73,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
-
+*/
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -85,13 +82,13 @@ public class SecurityConfig {
 
     //Este provider se conecta a la baase de datos y trae los usuarios
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailService){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(userDetailsService());
+        provider.setUserDetailsService(userDetailService);
         return provider;
     }
-
+/*
     //creo un usuario en vez de traerlo de la base de datos para hacer prueba basica
     @Bean
     public UserDetailsService userDetailsService(){
@@ -111,13 +108,22 @@ public class SecurityConfig {
 
         return new InMemoryUserDetailsManager(userDetailslist);
     }
+*/
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
+/*
+Este metodo vos le pones en el parametro la contraseña y cuando ejecutas esa linea
+te devuelve la contraseña encriptada
 
-
+    public static void main(String[] args) {
+        System.out.println(new BCryptPasswordEncoder().encode("1234"));
+    }
+*/
 
 }
 
