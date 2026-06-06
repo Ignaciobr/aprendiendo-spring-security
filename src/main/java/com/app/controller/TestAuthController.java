@@ -4,7 +4,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/method")
 //Pre authorize le pasamos por parametro que por defecto ya rechace toda soliticutd al endpoint
 @PreAuthorize("denyAll()")
 public class TestAuthController {

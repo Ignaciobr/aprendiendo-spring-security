@@ -1,6 +1,9 @@
 package com.app.config;
 
 
+import com.app.config.filter.JwtTokenValidator;
+import com.app.util.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +31,9 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
 
     //HTTPSecurity pasa por todos los filtros
@@ -60,20 +67,10 @@ public class SecurityConfig {
                     // http.anyRequest().authenticated();
 
                 })
+                //Antes del filtro basico, se va a ejectuar el filtro que hicimos
+                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
                 .build();
     }
-/*
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-        return httpSecurity
-
-                .csrf(csrf -> csrf.disable())
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .build();
-    }
-*/
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -88,27 +85,6 @@ public class SecurityConfig {
         provider.setUserDetailsService(userDetailService);
         return provider;
     }
-/*
-    //creo un usuario en vez de traerlo de la base de datos para hacer prueba basica
-    @Bean
-    public UserDetailsService userDetailsService(){
-        List<UserDetails> userDetailslist = new ArrayList<>();
-
-        userDetailslist.add(User.withUsername("Ignacio")
-                .password("1234")
-                .roles("ADMIN")
-                .authorities("READ", "CREATE")
-                .build());
-
-        userDetailslist.add(User.withUsername("Daniel")
-                .password("1234")
-                .roles("USER")
-                .authorities("READ")
-                .build());
-
-        return new InMemoryUserDetailsManager(userDetailslist);
-    }
-*/
 
 
 

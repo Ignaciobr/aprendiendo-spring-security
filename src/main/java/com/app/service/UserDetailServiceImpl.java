@@ -1,5 +1,7 @@
 package com.app.service;
 
+import com.app.controller.dto.AuthLoginRequest;
+import com.app.controller.dto.AuthResponse;
 import com.app.persistence.entity.UserEntity;
 import com.app.persistence.entity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +51,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 userEntity.isAccountNoLocked(),
                 //y le pasamos los permisos
                 authorityList);
+    }
+
+
+    public AuthResponse loginUser (AuthLoginRequest authLoginRequest) {
+
+        //Aca vamos a generar el token de ingreso 1:09:05
     }
 }
