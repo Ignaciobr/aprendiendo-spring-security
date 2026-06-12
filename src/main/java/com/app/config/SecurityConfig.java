@@ -45,14 +45,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 //Se utiliza cuando te  vas a logear solo con usuario y contraseña
                 //Cuando te logeas usando tokens va de una forma diferente
-                .httpBasic(Customizer.withDefaults())
+                //.httpBasic(Customizer.withDefaults())
                 //Aplicaciones web se tiene q trabajar sin estado
                 //El tiempo de duracion de logeo va a depender del tiempo de vida del token
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(http -> {
                     //Si se hace un http request aese endpoint se le permitetodo
                     //Configura los endpoinst publicos primeramente
-                    http.requestMatchers(HttpMethod.GET, "/auth/get").permitAll();
+                    //El ** es para que cuando logees no te tire error es de decri que permita logear atodos
+                    http.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
 
                     //solo a ese endpoint va a acceder el que tenga la autorizacion READ LECTURAO
                     //Despues los endpoints privadors

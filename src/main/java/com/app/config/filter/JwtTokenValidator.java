@@ -36,14 +36,15 @@ public class JwtTokenValidator extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(jwtToken != null ){
-            //Con esto extramos el string sin el Bearer  que son 6 lettras mas el espacio = 7
+            if(jwtToken == null || !jwtToken.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             jwtToken = jwtToken.substring(7);
 
-            //Lo validamos
             DecodedJWT decodedJWT = jwtUtils.validateToken(jwtToken);
 
             //Obtengo el usuario
@@ -62,10 +63,9 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
             //Le dimos autorizacion al usuario
 
-        }
         //Si el filtro no pasa por el if,m sigue con el otro filtro
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        }
 
 
     }
-}
